@@ -132,7 +132,7 @@ model.compile(optimizer='Nadam', loss='categorical_crossentropy', metrics=['accu
 ### Train the Model
 ในส่วนนี้จะเป็นขั้นตอนการเทรนโมเดล โดยมี parameters เป็น dataset train และ validate และจำนวน epochs (จำนวนครั้งที่โมเดลจะได้เห็น dataset train) 
 
-ในแต่ละรอบของ epoch โมเดลจะเห็น dataset train แล้วเช็คกับ labels เพื่อคิด loss function และ เช็คอีกทีกับ dataset validate ที่ไม่เคยเห็นเมื่อตอนเทรนเพื่อเช็ค overfitting โดยค่าทีออกมา accuracy และ val_accuracy ไม่ควรจะห่างกันจนเห็นได้ชัด 
+ในแต่ละรอบของ epoch โมเดลจะเห็น dataset train แล้วเช็คกับ labels เพื่อคิด loss function และ เช็คอีกทีกับ dataset validate ที่ไม่เคยเห็นเมื่อตอนเทรนเพื่อเช็ค overfitting โดยค่าที่ออกมา accuracy และ val_accuracy ไม่ควรจะห่างกันจนเห็นได้ชัด 
 
 ```
 # Train the model-------------------------------------------------------------------------------------------------
