@@ -220,6 +220,7 @@ def convert_pdf_to_images(pdf_path, output_folder):
 classify_image() parameters :
 - image_path : path ของ รูป .jpg เดี่ยวๆ
 - model : model ที่ import เข้ามา
+
 ฟังก์ชั่นนี้คือฟังก์ชั่นหลักที่รับ parameters ต่อมาจาก convert_pdf_to_images() และ classify_pdfs_in_folder() แล้วนำแต่ละภาพมาผ่าน preprocess_image() เพื่อปรับเป็น array และเตรียมพร้อมนำเข้าสู่โมเดล
 
 เมื่อนำเข้าโมเดลแล้ว ผลลัพธ์จะถูกนำไปคำนวณค่าความน่าจะเป็น และจำแนกเป็นประเภทไหนตาม category_labels
