@@ -1,0 +1,8 @@
+convolutional_model.h5
+convolutional_model2.h5
+
+data_for_test/*
+data_for_train/*
+data_for_validate/*
+dataset/*
+
