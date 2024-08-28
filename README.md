@@ -61,6 +61,8 @@ Repos นี้เป็นส่วนหนึ่งของโปรเจ�
 ## CNN Training Program
 โปรแกรมนี้เป็นส่วนของการสร้างและเทรนโมเดล โดยจะแยกเป็น 5 ส่วนหลักๆ 
 
+ก่อนที่จะใช้โปรแกรมนี้ ควรจะ pip install tensorflow (keras) เวอร์ชั่น 2, numpy, matplotlib, และ pillow 
+
 ### Importing Dataset
 ในส่วนนี้จะเป็นการเตรียมและแบ่ง dataset เป็นสองตัว train และ validate โดยจะแบ่ง 80% ของภาพใน data_for_train ไว้สำหรับ train และ 20% ของภาพใน data_for_train ไว้สำหรับ validate เพื่อเช็คอีกรอบในแต่ละ epochs
 ```
@@ -113,7 +115,7 @@ model.summary()
 
 ```
 # Compile the model-----------------------------------------------------------------------------------------------
-model.compile(optimizer='Nadam', loss='categorical_crossentropy', metrics=['accuracy']) #optimizer='Nadam'
+model.compile(optimizer='Nadam', loss='categorical_crossentropy', metrics=['accuracy']) 
 ```
 
 
@@ -144,10 +146,104 @@ print("Model saved")
 
 
 
-
-
-
-
-
-
 ## Model Usage Program in Python
+โปรแกรมนี้เป็นการนำโมเดลที่เทรนแล้วในไฟล์ .h5 มาใช้ โดยโปรแกรม python นี้เป็นต้นแบบของ ทั้ง DocumentClassifier_java และ idcardRotation ที่นำมาแปลและปรับเป็น Java คู่กับ deeplearning4j ในการ import โมเดลไปใช้
+
+เริ่มจากการ import โมเดล .h5 
+```
+# Load the trained model
+model = tf.keras.models.load_model('convolutional_model2.h5') #current best model convolutional_model2.h5
+```
+
+ต่อมาคือการเซ็ต path ของ pdf_folder ให้เป็น data_for_test\pdf และ output_folder ให้เป็น data_for_test\converted_img 
+
+### classify_pdfs_in_folder(pdf_folder, model, output_folder)
+ฟังก์ชั่นนี้ มี parameters :
+- pdf_folder : path ของ data_for_test\pdf
+- model : model ที่ import เข้ามา
+- output_folder : path ของ data_for_test\converted_img
+
+จะนำไฟล์ .pdf แต่ละอันในโฟลเดอร์ data_for_test\pdf มาแปลงให้เป็นรูปภาพก่อน แล้วนำไปเก็บไว้ใน output_folder หรือ data_for_test\converted_img จากนั้น แต่ละรูปจะถูกนำไปเข้าโมเดลเพื่อจำแนกประเภท โดยผลลัพธ์จะออกมาในรูปแบบ text ที่บอก ชื่อไฟล์ pdf, path ของรูปที่แปลง, ประเภทที่โมเดลได้จำแนก และ ค่าความน่าจะเป็น 
+
+```
+def classify_pdfs_in_folder(pdf_folder, model, output_folder):
+    for pdf_file in os.listdir(pdf_folder):
+        if pdf_file.endswith('.pdf'):
+            pdf_path = os.path.join(pdf_folder, pdf_file)
+            image_paths = convert_pdf_to_images(pdf_path, output_folder)
+            
+            for image_path in image_paths:
+                category_label, confidence = classify_image(image_path, model)
+                print(f'PDF: {pdf_file}, Image: {image_path} --> Type: {category_label}, Confidence: {confidence:.2f}%'
+```
+
+### convert_pdf_to_images(pdf_path, output_folder)
+
+Parameters :
+- pdf_path : path ของไฟล์ .pdf เดี่ยวๆ
+- output_folder : path ของ data_for_test\converted_img
+
+ฟังก์ชั่นนี้จะรับ parameters ต่อมาจาก classify_pdfs_in_folder() และทำการแปลง .pdf เป็น .jpg แล้วนำไปเก็บไว้ที่ data_for_test\converted_img
+
+```
+def convert_pdf_to_images(pdf_path, output_folder):
+    doc = fitz.open(pdf_path)
+    image_paths = []
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)
+        pix = page.get_pixmap()
+        image_path = os.path.join(output_folder, f'{os.path.basename(pdf_path).replace(".pdf", "")}_{page_num}.jpg')
+        pix.save(image_path)
+        image_paths.append(image_path)
+    return image_paths
+```
+
+
+### classify_image(image_path, model) และ  preprocess_image(image_path)
+classify_image() parameters :
+- image_path : path ของ รูป .jpg เดี่ยวๆ
+- model : model ที่ import เข้ามา
+ฟังก์ชั่นนี้คือฟังก์ชั่นหลักที่รับ parameters ต่อมาจาก convert_pdf_to_images() และ classify_pdfs_in_folder() แล้วนำแต่ละภาพมาผ่าน preprocess_image() เพื่อปรับเป็น array และเตรียมพร้อมนำเข้าสู่โมเดล
+
+เมื่อนำเข้าโมเดลแล้ว ผลลัพธ์จะถูกนำไปคำนวณค่าความน่าจะเป็น และจำแนกเป็นประเภทไหนตาม category_labels
+
+**หากมีการเพิ่มเติมประเภทของผลลัพธ์ category_labels ก็ควรจะเปลี่ยนตามด้วยเช่นกัน โดยสามารถยึดหลักได้ตามโฟลเดอร์ย่อยใน data_for_train** ซึ่งในตอนนี้มี 3 ตัวนั้นคือ invoice, OR, และ payment 
+
+
+```
+def preprocess_image(image_path):
+    image = load_img(image_path, target_size=(128, 128))
+    image = img_to_array(image)
+    image = np.expand_dims(image, axis=0)
+    image = image / 255.0  # Normalize the image
+    print(image.size)
+    return image
+
+def classify_image(image_path, model):
+    # Preprocess the image
+    image = preprocess_image(image_path)
+    print(image.shape)
+    
+    # Predict the category
+    prediction = model.predict(image)
+    category = np.argmax(prediction, axis=1)[0]
+    confidence = prediction[0][category] * 100  # Get the confidence percentage
+    
+    # Map category index to label
+    category_labels = {0: 'OR', 1: 'invoice', 2: 'payment'}
+    category_label = category_labels[category]
+    
+    return category_label, confidence
+```
+
+
+
+
+
+
+
+
+
+
+
+
