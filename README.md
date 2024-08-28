@@ -167,6 +167,13 @@ model = tf.keras.models.load_model('convolutional_model2.h5') #current best mode
 
 ต่อมาคือการเซ็ต path ของ pdf_folder ให้เป็น data_for_test\pdf และ output_folder ให้เป็น data_for_test\converted_img 
 
+```
+# Example usage
+pdf_folder = r'./data_for_test\pdf'
+output_folder = r'./data_for_test\converted_img'
+classify_pdfs_in_folder(pdf_folder, model, output_folder)
+```
+
 ### classify_pdfs_in_folder(pdf_folder, model, output_folder)
 ฟังก์ชั่นนี้ มี parameters :
 - pdf_folder : path ของ data_for_test\pdf
