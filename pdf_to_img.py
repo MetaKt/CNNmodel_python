@@ -25,7 +25,4 @@ def process_pdfs_in_folder(input_folder, output_folder):
 input_folder = r'./dataset\for_train'
 output_folder = r'./data_for_train' 
 
-input_folder2 = r'./dataset\for_validate'
-output_folder2 = r'./data_for_validate'
 process_pdfs_in_folder(input_folder, output_folder)
-process_pdfs_in_folder(input_folder2, output_folder2)
