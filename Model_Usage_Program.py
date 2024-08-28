@@ -54,5 +54,5 @@ def classify_pdfs_in_folder(pdf_folder, model, output_folder):
                 
 # Example usage
 pdf_folder = r'./data_for_test\pdf'
-output_folder = r'./data_for_test'
+output_folder = r'./data_for_test\converted_img'
 classify_pdfs_in_folder(pdf_folder, model, output_folder)
