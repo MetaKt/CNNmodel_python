@@ -52,7 +52,7 @@ model.fit(
     steps_per_epoch=train_generator.samples // train_generator.batch_size,
     validation_data=validation_generator,
     validation_steps=validation_generator.samples // validation_generator.batch_size,
-    epochs=5 #Epochs is adjustable
+    epochs=20 #Epochs is adjustable
 )
 
 # # Save the model-------------------------------------------------------------------------------------------------
